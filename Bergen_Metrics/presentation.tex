@@ -1,0 +1,903 @@
+\documentclass[xcolor={dvipsnames}]{beamer}
+\usepackage[utf8]{inputenc}
+
+\usepackage{geometry}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xcolor} 
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{gensymb}
+\usepackage{minted}
+\usepackage{multicol}
+
+
+\usetheme{Madrid}
+\usecolortheme{default}
+\setbeamertemplate{enumerate items}[default]
+\setbeamercolor*{structure}{bg=white,fg=black}
+
+
+\setbeamertemplate{footline}{}
+
+\setbeamertemplate{footline}
+
+
+\title[] %optional
+{Bergen Metrics: composite error metrics for assessing performance of climate models using EURO-CORDEX simulations}
+
+% \subtitle{A short story}
+
+
+\author[] % (optional)
+{Authors: A. ~Samantaray \and P. ~Mooney \and C. ~Vivacqua}
+
+\institute[VFU] % (optional)
+{ 
+  Norwegian Research Centre (Norce), Norway\\
+  \and
+  Bjerknes Centre for Climate Research, Norway\\
+  \and
+  Federal University at Rio Grande do Norte, Brazil\\
+}
+
+\date[VLC 2021] % (optional)
+{Presented by Alex Fidalgo, January 2024}
+
+% 右下角使用logo的方式
+% \logo{\includegraphics[height=1cm]{overleaf-logo}} 
+
+%End of title page configuration block
+%------------------------------------------------------------
+
+
+
+%------------------------------------------------------------
+%The next block of commands puts the table of contents at the 
+%beginning of each section and highlights the current section:
+
+\AtBeginSection[]
+{
+  \begin{frame}
+    \frametitle{Table of Contents}
+    \begin{multicols}{2}
+    \tableofcontents[currentsection]
+    \end{multicols}
+  \end{frame}
+}
+%------------------------------------------------------------
+
+
+\begin{document}
+
+%The next statement creates the title page.
+\frame{\titlepage}
+
+
+%---------------------------------------------------------
+%This block of code is for the table of contents after
+%the title page
+\begin{frame}
+\frametitle{Table of Contents}
+\begin{multicols}{2}
+\tableofcontents
+\end{multicols}
+\end{frame}
+%---------------------------------------------------------
+
+
+\section{Abstract}
+\begin{frame}
+\frametitle{Abstract}
+
+\begin{itemize}
+    \item<1-> This study proposes a new framework and composite error metrics called Bergen Metrics to summarise the overall performance of climate models and to ease interpretation of results from multiple error metrics. The framework of Bergen Metrics are based on the p-norm, and the first norm is selected to evaluate the climate models. \newline
+
+    \item<2-> The framework includes the application of a non-parametric clustering technique to multiple error metrics to reduce the number of error metrics with minimum information loss. \newline
+
+    \item<3> This study calculates \textbf{38 different error metrics} to assess the performance of \textbf{89 regional climate simulations} of precipitation and temperature over Europe. The non-parametric clustering technique is applied to these 38 metrics to reduce the number of metrics to be used in Bergen Metrics for \textbf{8 different sub-regions} in Europe.
+\end{itemize}
+
+\end{frame}
+
+\section{Abbreviations}
+
+\begin{frame}{Abbreviations}
+
+CMIP: Coupled Model Intercomparison Project\\
+CORDEX: Coordinated Regional Downscaling Experiment\\
+CRP: Chinese Restaurant Process \\
+GCM: Global Climate Model\\
+GTOPO30: Global 30 Arc-Second Elevation Data Set\\
+K-G: Kling-Gupta\\
+MSE: Mean Square Error\\
+NSE: Nash-Sutcliffe Efficiency\\
+RCM: Regional Climate Model\\
+RMSE: Root Mean Squared Error
+
+
+\end{frame}
+
+\section{Theory}
+
+\subsection{\textit{p}-norm}
+
+\begin{frame}
+\frametitle{\textit{p}-norm}
+
+\begin{alertblock}{Definition of \textit{p}-norm}
+For a vector \( \mathbf{x} = (x_1, x_2, \ldots, x_n) \) in \( \mathbb{R}^n \), the \( p \)-norm is defined as:
+
+\[ \| \mathbf{x} \|_p = \left( |x_1|^p + |x_2|^p + \ldots + |x_n|^p \right)^{1/p} \]
+\end{alertblock}
+
+
+
+The special cases are:
+
+\begin{itemize}
+\item<1-> When \( p = 1 \), it is the \( L^1 \) norm, also known as the Manhattan norm or taxicab norm. It is the sum of the absolute values of the vector components.
+
+\item<2-> When \( p = 2 \), it is the \( L^2 \) norm, also known as the Euclidean norm. It represents the Euclidean distance from the origin to the point in \( n \)-dimensional space.
+
+\item<3-> When \( p = \infty \), it is the \( L^\infty \) norm or maximum norm. It is the maximum absolute value of any component in the vector.
+\end{itemize}
+
+\end{frame}
+
+
+
+\subsection{Clustering Techniques}
+\begin{frame}
+\frametitle{Clustering Techniques}
+
+
+A clustering technique is a method to group similar data points together based on certain features. The goal is to identify patterns, similarities, or natural groupings within a dataset, without having predefined labels for the groups. The process involves partitioning the data into clusters, where data points within the same cluster are more similar to each other than to those in other clusters.
+
+\pause
+
+\hfill
+
+\begin{table}
+    \centering
+    \vspace{-0.4cm}
+    \caption{Examples of Non-Parametric and Parametric Clustering Techniques}
+    \vskip -0.5cm
+    \resizebox{\textwidth}{!}{
+        \begin{tabular}{|c|c|}
+            \hline
+            \textbf{Non-Parametric Clustering} & \textbf{Parametric Clustering} \\
+            \hline
+            K-Means & Gaussian Mixture Model (GMM) \\
+            \hline
+            DBSCAN (Density-Based Spatial Clustering of Applications with Noise) & Hierarchical Clustering \\
+            \hline
+            OPTICS (Ordering Points To Identify the Clustering Structure) &  Expectation-Maximization (EM) \\
+            \hline
+            Agglomerative Clustering  & \\
+            \hline
+        \end{tabular}
+    }
+\end{table}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Clustering Techniques}
+
+Non-parametric clustering algorithms do not make explicit assumptions about the underlying distribution of the data. Instead, these methods often rely on the intrinsic structure and density of the data to identify clusters. The methods adapt to the data's intrinsic characteristics. \newline
+
+\pause
+
+Parametric clustering techniques assume a specific distribution for the data. These methods aim to model the data using predefined parameters, and clustering is often based on fitting these models to the observed data. They are suitable when there is a clear assumption about the distribution of the data and the number of clusters is known or can be estimated. \newline
+
+\pause
+
+A subset of algorithms blurs the boundaries between these two classifications. For instance, hierarchical clustering do not explicitly assume a fixed number of clusters (non-parametric aspect) but may involve merging or splitting clusters based on certain criteria (parametric aspect). Some models demonstrate a hybrid nature, embracing both parametric and non-parametric characteristics.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-Parametric Clustering Techniques}
+
+\begin{itemize}
+
+    \item \textbf{K-Means:} A partitioning method that divides the dataset into K clusters. Each data point belongs to the cluster with the nearest mean. Simple and widely used but assumes clusters are spherical and equally sized.
+
+    \item \textbf{DBSCAN (Density-Based Spatial Clustering of Applications with Noise):}  A density-based clustering algorithm, which groups together data points that are close to each other based on a density threshold.It is robust to noise and can discover clusters of arbitrary shapes.
+
+    \item \textbf{OPTICS (Ordering Points To Identify the Clustering Structure):} A density-based clustering. It orders points based on their reachability distance, revealing clustering structure at different density levels.
+
+    \item \textbf{Agglomerative Clustering:} Agglomerative Clustering is a bottom-up approach where each data point starts as its own cluster. Clusters are successively merged based on their similarity, creating a hierarchy. Versatile but sensitive to outliers.
+    
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Parametric Clustering Techniques}
+\begin{itemize}
+
+    \item \textbf{Gaussian Mixture Model (GMM):} A probabilistic model representing the data as a mixture of Gaussian distributions. Capable of capturing complex patterns in the data and handling overlapping clusters.
+
+    \item \textbf{Hierarchical Clustering:} Hierarchical Clustering creates a tree of clusters by iteratively merging or splitting existing clusters. Provides a hierarchy of clusters, allowing for a flexible exploration of the data structure.
+
+    \item \textbf{Expectation-Maximization (EM):} Used for fitting various parametric models, including GMMs, but also others like Hidden Markov Models (HMMs) or Latent Dirichlet Allocation (LDA). Alternates between estimating model parameters (Expectation step) and assigning data points to clusters (Maximization step). Flexible for different model types, handles missing data, and can model soft cluster assignments. Can be computationally expensive and sensitive to initialization.
+\end{itemize}
+\end{frame}
+
+\subsection{Error Metrics}
+
+\subsubsection{Root Mean Squared Error}
+\begin{frame}
+\frametitle{Root Mean Squared Error}
+
+Root Mean Square Error (RMSE) measures the average magnitude of the errors between the model predictions and the reference data. For a set of $n$ observations, let $y_i$ be the observed values and $\hat{y}_i$ be the corresponding predicted values from the model.
+
+\begin{alertblock}{RMSE Calculation}
+\[
+\text{RMSE} = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}
+\]
+\end{alertblock}
+
+\pause
+
+The squared differences between the observed and predicted values are averaged, and the square root of this average provides a measure of the typical magnitude of errors. A lower RMSE indicates better agreement between the model and the reference data.
+    
+\end{frame}
+
+\subsubsection{Correlation Coefficient}
+
+\begin{frame}
+\frametitle{Correlation Coefficient}
+
+The correlation coefficient is a statistical measure that quantifies the strength and direction of a linear relationship between two variables. In the context of climate model evaluation, it is often used to assess the similarity in the phase or pattern of variability between modelled and reference data.
+
+\pause
+
+\hfill
+
+For a set of $n$ observations, let $x_i$ and $y_i$ be the paired values of the two variables. The correlation coefficient is denoted by $r$.
+
+\begin{alertblock}{Calculation of the correlation coefficient}
+\[
+r = \frac{\sum_{i=1}^{n} (x_i - \bar{x})(y_i - \bar{y})}{\sqrt{\sum_{i=1}^{n} (x_i - \bar{x})^2 \sum_{i=1}^{n} (y_i - \bar{y})^2}}
+\]
+\end{alertblock}
+
+where $\bar{x}$ and $\bar{y}$ are the means of the variables $x$ and $y$, respectively.
+
+\end{frame}
+
+\begin{frame}{Correlation Coefficient}
+The correlation coefficient ranges from -1 to 1. 
+
+\begin{itemize}
+    \item A value of 1 indicates a perfect positive linear relationship
+    \item A value of -1 indicates a perfect negative linear relationship
+    \item A value of 0 indicates no linear relationship
+\end{itemize}
+
+\hfill
+
+In the context of climate model evaluation, a higher absolute value of the correlation coefficient suggests a better agreement between the modelled and reference data in terms of the phase of variability.
+
+\end{frame}
+
+\subsection{Chinese Restaurant Process}
+
+\begin{frame}{Chinese Restaurant Process}
+
+The Chinese Restaurant Process (CRP) is a stochastic process which describes the distribution of objects among an infinite number of tables. It is a statistical concept used for clustering data without predefining the number of clusters.
+
+\hfill
+
+The name is used to help visualize the process, where customers are entering a restaurant and deciding which table to join based on some probabilistic rules.
+
+\hfill
+
+\pause
+
+\begin{enumerate}
+    \item<2-> Initialization:
+    \begin{itemize}
+        \item Imagine an infinite Chinese restaurant with an infinite number of tables.
+    \end{itemize}
+    
+    \item<3> Customer Arrival:
+    \begin{itemize}
+        \item Customers enter the restaurant one at a time.
+        \item The first customer sits at the first table.
+    \end{itemize}
+
+\end{enumerate}
+    
+\end{frame}
+
+\begin{frame}{Chinese Restaurant Process}
+
+\begin{enumerate}
+
+    \setcounter{enumi}{2}
+
+    \item<1-> Subsequent Customer Arrivals:
+    \begin{itemize}
+        \item Each subsequent customer can either choose to sit at an existing table with probability proportional to the number of customers already seated at that table (favoring popular tables) or choose a new table with a probability proportional to a concentration parameter (encouraging exploration of new tables).
+    \end{itemize}
+
+    \item<2-> Table Occupancy:
+    \begin{itemize}
+        \item Tables get occupied as more customers join them.
+        \item Popular tables are likely to have more customers.
+    \end{itemize}
+
+    \item<3> Infinite Tables:
+    \begin{itemize}
+        \item The process continues infinitely, allowing an infinite number of tables to be occupied.
+    \end{itemize}
+\end{enumerate}
+    
+\end{frame}
+
+\section{Climatology Topics}
+
+\subsection{CMIP}
+
+\begin{frame}{CMIP}
+
+The objective of the Coupled Model Intercomparison Project (CMIP) is to better understand past, present and future climate changes arising from natural, unforced variability or in response to changes in radiative forcing in a multi-model context. This understanding includes assessments of model performance during the historical period and quantifications of the causes of the spread in future projections. Idealized experiments are also used to increase understanding of the model responses. In addition to these long time scale responses, experiments are performed to investigate the predictability of the climate system on various time and space scales as well as making predictions from observed climate states. An important goal of CMIP is to make the multi-model output publically available in a standardized format \footnote{\href{https://www.wcrp-climate.org/wgcm-cmip}{\textcolor{blue}{World Climate Research Programme - CMIP}}}.
+
+\end{frame}
+
+\subsection{CORDEX}
+
+\begin{frame}{Cordex}
+
+The Coordinated Regional Downscaling Experiment (CORDEX) is a CMIP6 diagnostic MIP requesting specific CMIP6 output for regional climate downscaling. CORDEX builds on a foundation of previous downscaling intercomparison projects to provide a common framework for downscaling activities around the world. The CORDEX Regional Challenges provide a focus for downscaling research and a basis for making use of CMIP6 global output to produce downscaled projected changes in regional climates, and assess sources of uncertainties in the projections \footnote{\href{https://www.wcrp-climate.org/}{\textcolor{blue}{World Climate Research Programme}}}.
+    
+\end{frame}
+
+\subsection{E-OBS}
+
+\begin{frame}{E-OBS}
+
+E-OBS is a daily gridded land-only observational dataset over Europe. The blended time series from the station network of the European Climate Assessment & Dataset (ECA&D) project form the basis for the E-OBS gridded dataset\footnote{\href{https://cds.climate.copernicus.eu/cdsapp#!/dataset/insitu-gridded-observations-europe?tab=overview}{\textcolor{blue}{Copernicus}}}.
+
+\pause
+
+\hfill
+
+Main variables:
+\begin{itemize}
+    \item Land Surface Elevation ($m$): Earth's surface height above sea level derived from the GTOPO30.
+    \item Maximum Temperature ($\degree C$): Daily maximum air temperature measured near the surface, usually at a height of 2 meters.
+    \item Mean Temperature ($\degree C$): Daily mean air temperature measured near the surface, usually at a height of 2 meters.
+    \item Minimum Temperature ($\degree C$): Daily minimum air temperature measured near the surface, usually at a height of 2 meters.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{E-OBS}
+
+\begin{itemize}
+    \item Precipitation amount ($mm$): Total daily amount of rain, snow and hail measured as the height of the equivalent liquid water in a square meter The data sources for the precipitation are rain gauge data which do not have a uniform way of defining the 24-hour period over which precipitation measurements are made. Therefore, there is no uniform time period (for instance, 06 UTC previous day to 06 UTC today) which could be attached to the daily precipitation.
+    \item Relative humidity ($\%$): Daily mean relative humidity measured near the surface usually at a height of 2 meters. Relative humidity values relate to actual humidity and saturation humidity. Values are in the interval [0,100]. 0\% means that the air in the grid cell is totally dry whereas 100\% indicates that the air in the cell is saturated with water vapour.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{E-OBS}
+
+\begin{itemize}
+    \item Sea level pressure ($hPa$): Daily mean air pressure at sea level. In regions where the Earth's surface is above sea level the surface pressure is used to compute the air pressure that would exist at sea level directly below given a constant air temperature from the surface to the sea level point.
+    \item Surface shortwave downwelling radiation ($\frac{w}{m^2}$): The flux of shortwave radiation (also known as solar radiation) measured at the Earth's surface.
+    \item Wind speed ($\frac{m}{s}$): Daily mean wind speed at 10 meter height.
+\end{itemize}
+    
+\end{frame}
+
+\begin{frame}{E-OBS}
+
+E-OBS comes as an ensemble dataset and is constructed through a conditional simulation procedure. For each of the members of the ensemble a spatially correlated random field is produced using a pre-calculated spatial correlation function. The mean across the members is calculated and is provided as the "best-guess" fields. The spread is calculated as the difference between the $5^{th}$ and $95^{th}$ percentiles over the ensemble to provide a measure indicate of the 90\% uncertainty range\footnote{\href{https://www.ecad.eu/download/ensembles/download.php}{\textcolor{blue}{European Climate Assessment and Dataset}}}.
+
+\hfill
+
+The E-OBS data can be obtained from the \href{https://cds.climate.copernicus.eu/api-how-to}{\textcolor{blue}{Copernicus - How to use API}}. Each API request can be generated from \href{https://cds.climate.copernicus.eu/cdsapp#!/dataset/insitu-gridded-observations-europe?tab=form}{\textcolor{blue}{Copernicus - Show API}}.
+
+\end{frame}
+
+\begin{frame}{E-OBS}
+
+\begin{figure}[H]
+  \raggedright
+  \includegraphics[width=0.6\textwidth]{api.png}\\
+  \label{fig:api}
+\end{figure}
+
+This request, for example, generates a 150 MB file. This code can be accessed at \href{https://github.com/AlexFidalgo/BergenProject/blob/main/Bergen_Metrics/api.py}{\textcolor{blue}{GitHub - API}}.
+    
+\end{frame}
+
+
+\section{Introduction}
+
+\begin{frame}
+\frametitle{Introduction}
+
+Climate model evaluation is essential for identifying models that poorly simulate the climate system, and for ranking of climate models. The main purpose of climate model evaluation is twofold; firstly, to ensure that the models are reproducing key aspects of the climate system and secondly to understand the limitations of climate projections from the models. \newline
+
+\pause
+
+The performance of climate models is quantified by different error metrics such as root mean square error, and bias, which assess the agreement between the climate model data and reference data (e.g., gridded observational products, station data, reanalyses, or satellite observations).
+
+\end{frame}
+
+\begin{frame}{Introduction}
+
+Error metrics can be categorized into three different classes: accuracy, precision, and association.
+
+\begin{table}[h]
+\footnotesize
+\centering
+\begin{tabular}{|>{\centering\arraybackslash}m{2cm}|>{\raggedright\arraybackslash}m{8cm}|}
+\hline
+\textbf{Category} & \textbf{Description} \\
+\hline
+\textbf{Accuracy} & Measures the degree of similarity between climate model data and reference data. An extremely high accuracy indicates low error magnitude, and further testing with other metrics may add little value. \textcolor{blue}{Root mean square error} (RMSE) and \textcolor{blue}{mean square error} (MSE) are commonly used accuracy metrics. \\
+\hline
+\textbf{Precision} & Quantifies the degree of similarity in the spread of the data. A widely used metric is the \textcolor{blue}{ratio or difference of standard deviation} between modelled data and reference data. \\
+\hline
+\textbf{Association} & Measures the degree of phase difference between modelled data and observed data. Phase difference is important in climate studies, impacting the initiation and termination time of climate variables. The \textcolor{blue}{correlation coefficient} is a commonly used metric for assessing association. \\
+\hline
+\end{tabular}
+\end{table}
+    
+\end{frame}
+
+\begin{frame}{Introduction}
+
+\subsection*{Taylor Diagram}
+
+A widely used example of a composite error metric is the \textcolor{brown}{Taylor diagram}. It incorporates various metrics to compute the error magnitude, including:
+\begin{itemize}
+    \item Correlation
+    \item Root mean square deviation
+    \item Ratio of standard deviation
+\end{itemize}
+It permits graphical evaluation of the model performance. \newline
+
+\pause
+
+The \textcolor{brown}{Nash-Sutcliffe Efficiency} (NSE) is a normalized form of the mean squared error and is used to evaluate and predict model streamflow data. It can be decomposed into three components, which are functions of:
+\begin{itemize}
+    \item Correlation
+    \item Bias
+    \item Standard deviation
+\end{itemize}
+
+It has a bias component normalized by the standard deviation of the reference data and will have a low weight on the bias component if the reference data has high variability.
+
+\end{frame}
+
+\begin{frame}{Introduction}
+
+Another composite error metric is the \textcolor{brown}{Kling-Gupta efficiency} (K-G), which is a function of three components:
+\begin{itemize}
+    \item Ratio of model mean to observed mean
+    \item Ratio of model standard deviation to observed standard deviation
+    \item Correlation coefficient
+\end{itemize} 
+
+\pause
+
+\hfill
+
+Kling et al. (2012) proposed a modification to the Kling-Gupta efficiency, known as the \textcolor{brown}{modified Kling-Gupta efficiency}. This modification involves the ratio of covariance instead of the ratio of standard deviation.
+
+\pause
+
+\hfill
+
+Both K-G efficiency and modified K-G efficiency use \textbf{Euclidean distance} as a basis to calculate the error magnitude of the model and the study argued that instead of finding a corrected NSE criterion, the whole problem can be viewed from the multi-objective perspective where the three error components can be used as separate criteria to be optimized. 
+
+\end{frame}
+
+\begin{frame}{Introduction}
+
+It identifies the best models by calculating the Euclidean distance from the ideal point and then finding the model with the shortest distance.
+
+\hfill
+
+The Euclidean distance is also used to develop the \textcolor{brown}{DISO} metric that incorporates:
+\begin{itemize}
+    \item Correlation coefficient
+    \item absolute error
+    \item root mean squared error
+\end{itemize}
+
+\pause
+
+\hfill
+
+\textcolor{blue}{Accuracy} (root mean square error), \textcolor{blue}{bias} (absolute error) and \textcolor{blue}{association} (correlation coefficient) are the three major error classes based on which a model should be assessed and evaluating a model using a single error metric may lead to ill-informed results.
+
+\end{frame}
+
+\begin{frame}{Introduction}
+
+If the vector $x_i$ is the difference between the observed data $u_i$ and the model data $v_i$, $ x_i = u_i - v_i \text{;}$, where $i$ represents the time series data. We have:
+
+\[
+d_p(u, v) = \left( \sum_{i=1}^{n} \left| x_i(u_i, v_i) \right|^p \right)^{1/p}
+\]
+
+\pause
+
+When $p = 2$, it becomes the Euclidean norm. 
+
+\[
+d_2(u, v) = \sqrt{\sum_{i=1}^{n} \left| x_i(u_i, v_i) \right|^2}
+\]
+
+\pause
+
+Root mean squared error and mean squared error are different variants of Euclidian distance metric.
+
+If the vector is the difference between error metrics (correlation coefficient $u_1$, absolute error $u_2$ and root mean squared error $u_3$) and their ideal values $v_{1:3}$, then d is called the DISO index.
+
+\end{frame}
+
+\begin{frame}{Introduction}
+
+A disadvantage of the Euclidean distance is that it suffers the curse of dimensionality\footnote{The efficiency or performance of certain algorithms or metrics degrades as the dimensionality (number of features or variables) of the data increases.}: as a dissimilarity index, the Euclidean distance becomes less efficient as dimension increases. 
+    
+\end{frame}
+
+\section{Objectives}
+
+\begin{frame}{Objectives}
+
+In this study, we assess the \textcolor{cyan}{effect of the norm order on the overall error}. We use different measures such as \textcolor{blue}{the contribution of outliers to the overall error}, \textcolor{blue}{the difference between the maximum and minimum distances}, and \textcolor{blue}{the average distances to compare different norms}.
+
+\hfill
+
+\pause
+
+Objectives:
+\begin{itemize}
+    \item<1-> Evaluation of 89 CMIP5 driven regional climate simulations from the Euro-CORDEX initiative using 38 error metrics.
+    \item<3-> Clustering of error metrics to assess their performance.
+    \item<4-> Assessment and recommendation of different p-norms based on their performance.
+    \item<5> Formulation of a composite metric using the optimal norm.
+\end{itemize}
+    
+\end{frame}
+
+\section{Data and Study Area}
+
+
+\begin{frame}{Data and Study Area}
+
+We focus on Europe due to the widespread availability of a large ensemble of high-resolution (0.11°) regional climate simulations. In this study, we use 89 regional climate model (RCM) simulations from Euro-CORDEX to study the behavior of different error metrics. The Euro-CORDEX dataset provides both precipitation and temperature data at 0.11° grid resolution. The monthly data from 1975 to 2005, which is available in all the RCM simulations, have been used to calculate the index.
+
+\pause
+
+\hfill
+
+GCMs were downscaled by different RCMs. Downscaling refers to the process of obtaining higher-resolution climate information from lower-resolution data. GCMs provide simulations of the climate system at a coarse spatial resolution. For more localized and detailed studies, especially at regional scales, higher-resolution information is often needed. RCMs are employed to achieve this by downscaling the output of GCMs.
+    
+\end{frame}
+
+\begin{frame}{Data and Study Area} 
+
+GCMs typically operate at a coarse spatial resolution, meaning that the simulated climate information is averaged over large grid cells covering extensive geographic areas.
+
+\pause
+
+\hfill
+
+RCMs are more specialized models designed to simulate climate at a higher spatial resolution but over a smaller geographic domain. They provide more detailed information for specific regions.
+
+\pause
+
+\hfill
+
+The downscaling process involves taking the output of a GCM and using it as input for one or more RCMs. The RCMs then simulate the climate for a particular region at a finer spatial scale compared to the original GCM. By downscaling, we can obtain climate information at a higher spatial resolution.
+
+\pause
+
+\hfill
+
+Often, multiple RCMs are applied to downscale the output of a single GCM. This results in an ensemble of downscaled models, providing a range of possible climate scenarios for the chosen region.
+
+\end{frame}
+
+\begin{frame}{Data Study and Area}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.7\textwidth]{european_study_regions.png}
+    \setlength{\abovecaptionskip}{0pt}
+    \caption*{\tiny{The European study region and it’s subregions: 1) British Isles (BI) 2) Iberian Peninsula (IP) 3) France (FR) 4) Mid-Europe (ME) 5) Scandinavia (SC) 6) Alps (AL) 7) Mediterranean 8) Eastern Europe (EA)}}
+    \label{fig:european_study_regions}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Data and Study Area}
+
+The reference data has a 0.25° grid spacing. The options presented for E-OBS data are:
+
+\hfill
+
+\textbf{Product type}: Ensemble mean, Ensemble spread, Elevation. \newline
+\textbf{Variable}: Mean temperature, Maximum temperature, Sea level pressure, Relative humidity, Land surface elevation, Minimum temperature, Precipitation amount, Surface shortwave downwelling radiation, Wind speed. \newline
+\textbf{Grid resolution}: 0.1deg, 0.25deg. \newline
+\textbf{Period}: Full period, 1950-1964, 1965-1979, 1980, 1994, 1995-2010, 2011-2019, 2011-2020, 2011-2021, 2011-2022, 2011-2023. \newline
+\textbf{Version}: 28.0e, 27.0e, 26.0e, 25.0e, 24.0e, 23.0e, 22.0e, 21.0e. \newline
+\textbf{Format}: .zip, .tar.gz.
+ 
+\end{frame}
+
+\section{Methodology}
+
+\begin{frame}{Methodology}
+
+This section outlines the framework for clustering error metrics and describes the proposed metric's framework.
+    
+\end{frame}
+
+\subsection{Error Metrics}
+
+\begin{frame}{Error Metrics}
+
+Euro-CORDEX precipitation data has been analyzed and examined the differences in ranking of \textcolor{brown}{89 GCM-driven regional climate simulations} using \textcolor{cyan}{38 error metrics}: 
+
+\begin{center}
+\begin{tabular}{|>{\tiny}c|>{\tiny}l|>{\tiny}c|}
+\hline
+\textbf{Number} & \textbf{Metrics} & \textbf{Abbreviation} \\
+\hline
+1 & Anomaly Correlation Coefficient & ACC \\
+2 & Index of Agreement & d \\
+3 & Legate-McCabe Index of Agreement & D1 \\
+4 & Index of Agreement & d1 \\
+5 & Modified Index of Agreement & d (Mod.) \\
+6 & Index of Agreement Refined & dr \\
+7 & Euclidean Distance & ED \\
+8 & Mean Absolute H10 Error & H10 (MAHE) \\
+9 & Inertial Root Mean Square Error & IRMSE \\
+10 & Kling-Gupta Efficiency (2009) & KGE (2009) \\
+11 & Kling-Gupta Efficiency (2012) & KGE (2012) \\
+12 & Legate-McCabe Efficiency Index & E1 \\
+\hline
+\end{tabular}
+\end{center}
+    
+\end{frame}
+
+\begin{frame}{Error Metrics}
+\begin{center}
+\begin{tabular}{|>{\tiny}c|>{\tiny}l|>{\tiny}c|}
+\hline
+\textbf{Number} & \textbf{Metrics} & \textbf{Abbreviation} \\
+\hline
+13 & Mean Absolute Error & MAE \\
+14 & Mean Absolute Log Error & MALE \\
+15 & Mean Absolute Percentage Deviation & MAPD \\
+16 & Mean Absolute Scaled Error & MASE \\
+17 & Mielke-Berry R & (MB) R \\
+18 & Median Absolute Error & MdAE \\
+19 & Median Error & MdE \\
+20 & Median Squared Error & MdSE \\
+21 & Mean Error & MEE \\
+22 & Mean Variance & MV \\
+23 & Mean Squared Error & MSE \\
+24 & Normalized Euclidean Distance & NED \\
+25 & Normalized Root Mean Square Error - IQR & NRMSE (IQR) \\
+26 & Normalized Root Mean Square Error - Mean & NRMSE (Mean) \\
+27 & Normalized Root Mean Square Error - Range & NRMSE (Range) \\
+\hline
+\end{tabular}
+\end{center}    
+\end{frame}
+
+\begin{frame}{Error Metrics}
+
+\begin{center}
+\begin{tabular}{|>{\tiny}c|>{\tiny}l|>{\tiny}c|}
+\hline
+\textbf{Number} & \textbf{Metrics} & \textbf{Abbreviation} \\
+\hline
+28 & Nash-Sutcliffe Efficiency & NSE \\
+29 & Modified Nash-Sutcliffe Efficiency & NSE (Mod.) \\
+30 & Pearson Correlation Coefficient & R (Pearson) \\
+31 & Coefficient of Determination & r2 \\
+32 & Root Mean Square Error & RMSE \\
+33 & Spectral Angle & SA \\
+34 & Spectral Correlation & SCO \\
+35 & Spectral Gradient Angle & SGA \\
+36 & Spearman Rank Correlation Coefficient & R (Spearman) \\
+37 & Volumetric Efficiency & VE \\
+38 & Watterson's M & M \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{All \textcolor{brown}{89 models} are ranked based on their performance using the \textcolor{cyan}{38 error metrics}}. The following calculations will allow us to understand the performance of different error metrics and the extent of the disparity in ranking of the climate models.
+
+\end{frame}
+
+\begin{frame}{Error Metrics}
+
+The average ($r_{M,\text{mean}}$) and maximum ($r_{M,\text{max}}$) rank differences were calculated at each grid point. 
+
+\begin{alertblock}{Rank Differences}
+$$r_{M,\text{mean}} = \mu_g(R_{M,k} - R_{M,i})$$
+$$ r_{M,\text{max}} = \mu_g(R_{M,k} - R_{M,i}) $$
+\end{alertblock}
+
+\begin{center}
+\begin{tabular}{|c|l|}
+  \hline
+  $R_{M,k}$ & Rank assigned to model $M$ by the $k_{th}$ error metric \\
+  \hline
+  $r_{M, \text{mean}}$ & Mean of all pairwise rank differences \\
+  \hline
+  $r_{M,\text{max}}$ & Maximum of all pairwise rank differences \\
+  \hline
+  $\mu$ & Mean operator \\
+  \hline
+  $N_E$ & Total number of error metrics \\
+  \hline
+  $k$ & Index, $k \in [1, N_E-1]$ \\
+  \hline
+  $i$ & Index, $i \in [k+1, N_E]$ \\
+  \hline
+  $g$ & Index of grid points, $g \in [1, gd]$ \\
+  \hline
+\end{tabular}
+\end{center}
+
+\end{frame}
+
+\begin{frame}{Error Metrics}
+    
+\begin{table}[h]
+  \centering
+  \caption{Example of Ranking Order}
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Number & Climate model & Ranking order (RO) by $i_{th}$ error metric ($E_i$) \\
+    \hline
+    1 & M_1 & 3 \\
+    2 & M_2 & 1 \\
+    3 & M_3 & 2 \\
+    \hline
+  \end{tabular}
+  \quad
+  \begin{tabular}{|c|c|c|}
+    \hline
+    Number & Climate model & Ranking order (RO) by $k_{th}$ error metric ($E_k$) \\
+    \hline
+    1 & M_1 & 2 \\
+    2 & M_2 & 3 \\
+    3 & M_3 & 1 \\
+    \hline
+  \end{tabular}
+\end{table}
+
+$R_{M=1,i} = 3$ and $R_{M=1,k} = 2$
+
+The difference in ranking is calculated for all possible combinations of error metrics.
+
+\end{frame}
+
+\subsubsection{Ranking Order Example}
+
+\begin{frame}{Ranking Order Example}    
+
+Assuming three climate models $M_1$, $M_2$, and $M_3$ with rankings based on two error metrics $E_1$ and $E_2$:
+
+\begin{align*}
+&\text{Rankings by } E_1: \\
+&M_1: 3, \quad M_2: 1, \quad M_3: 2 \\
+&\text{Rankings by } E_2: \\
+&M_1: 2, \quad M_2: 3, \quad M_3: 1 \\
+\end{align*}
+
+Now, let's calculate $r_{M,\text{mean}}$ for $M_1$, the average rank difference for M1 across all the grid points based on the given error metrics.
+
+\end{frame}
+
+\begin{frame}{Ranking Order Example}
+
+\begin{align*}
+r_{M,\text{mean}} &= \mu_g(R_{M,k} - R_{M,i}) \\
+&= \frac{1}{g} \sum_{k=1}^{N_E-1} \sum_{i=k+1}^{N_E} (R_{M,k} - R_{M,i}) \\
+&= \frac{1}{g} \left[ (R_{M,1} - R_{M,2}) + (R_{M,1} - R_{M,3}) + (R_{M,2} - R_{M,3}) \right] \\
+&= \frac{1}{g} \left[ (3 - 1) + (3 - 2) + (1 - 2) \right] \\
+&= \frac{1}{g} \cdot 2 \\
+\end{align*}
+
+If we assume $g = 4$:
+
+\begin{align*}
+r_{M,\text{mean}} &= \frac{2}{4} = \frac{1}{2}
+\end{align*}
+
+\end{frame}
+
+\begin{frame}{Error Metrics}
+
+Different error metrics used to assess climate models result in significantly different ranking orders. The average of $r_{M,mean}$ across all the grid point varies from 16 to 26 whereas the average of $r_{M, max}$ varies from 40 to 70. 
+
+\pause
+
+\hfill
+
+The results indicate significant differences in the ranking of the climate models by different error metrics. The disparity in ranking order may be due to the distinctive error targeted by each metrics.
+
+\pause
+
+\hfill
+
+To achieve independence among the metrics, the study has attempted to cluster the error metrics based on model performance. This classification would enable different clusters to have unique characteristics, and metrics within the same cluster would produce similar results, whereas those from different clusters would yield different ranking orders. In summary, \textit{the study proposes that using multiple error metrics and clustering them based on performance could improve the understanding and comprehensiveness of climate model analysis}.
+
+\end{frame}
+
+\begin{frame}{Error Metrics}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{rank_differences.png}
+    \setlength{\abovecaptionskip}{0pt}
+    \caption*{\tiny{Box plot of average rank difference (first column [a, c]) and maximum rank difference (second column; [b, d]) for precipitation (Pr; first row [a, b]) and temperature (T;second row [c, d]) over all the grid points in European region}}
+    \label{fig:rank_differences}
+\end{figure}
+    
+\end{frame}
+
+\subsection{Clustering of Error Metrics}
+
+\begin{frame}{Clustering of Error Metrics}
+
+The aim of clustering error metrics is to group a set of metrics based on their similarities such that \textcolor{green}{the metrics within the same cluster generate similar rankings of climate models compared to those in different clusters}. This study clusters the error metrics using a non-parametric clustering approach inspired by the CRP. This approach was chosen based on its performance compared to the k-means clustering approach and its simpler framework.
+
+\hfill
+
+\pause
+
+The CRP has flexibility and ability to handle an unknown or potentially infinite number of clusters, which is a characteristic of Bayesian nonparametric models. It allows for a more adaptive and data-driven approach to clustering, as opposed to fixed and pre-determined cluster sizes often seen in methods like k-means clustering.
+    
+\end{frame}
+
+\subsubsection{Clustering Algorithm}
+
+\begin{frame}{Clustering Algorithm}
+
+The code can be accessed at \href{https://github.com/AlexFidalgo/BergenProject/blob/main/Bergen_Metrics/clustering_algorithm/clustering_algorithm.py}{\textcolor{blue}{GitHub - Clustering Algorithm}.}
+
+\hfill
+
+The first error metric $E_1$ forms the first cluster $C_1$. The $i_{th}$ error metric is assigned to a cluster which has the maximum of all the mean absolute error ($u_j$) greater than a particular threshold value $\tau$.
+    
+\end{frame}
+    
+
+
+
+
+\section{Conclusion}
+
+\begin{frame}
+\frametitle{Conclusion}
+
+\begin{itemize}
+    \item Results show it is possible to observe contradictory behavior among error metrics when examining a single model. Therefore, the study also underscores the significance of employing multiple error metrics depending on the specific use case to achieve a thorough understanding of the model behavior.
+
+\end{itemize}
+
+\end{frame}
+
+\end{document}
