@@ -4,6 +4,6 @@ This project is related to the simulations discussed in the [Bergen Metrics: com
 
 ## Overview
 
-Check `presentation.tex`: The LaTeX source file for the project presentation.
+Check `presentation.tex` file ([Presentation](https://github.com/AlexFidalgo/BergenProject/blob/main/Bergen_Metrics/presentation.tex)): The LaTeX source file for the project presentation.
 
 
