@@ -110,10 +110,12 @@ CRP: Chinese Restaurant Process \\
 GCM: Global Climate Model\\
 GTOPO30: Global 30 Arc-Second Elevation Data Set\\
 K-G: Kling-Gupta\\
+MAE: Mean Absolute Error\\
 MSE: Mean Square Error\\
 NSE: Nash-Sutcliffe Efficiency\\
 RCM: Regional Climate Model\\
-RMSE: Root Mean Squared Error
+RMSE: Root Mean Squared Error\\
+SD: Standard Deviation ratio 
 
 
 \end{frame}
@@ -361,7 +363,7 @@ The Coordinated Regional Downscaling Experiment (CORDEX) is a CMIP6 diagnostic M
 
 \begin{frame}{E-OBS}
 
-E-OBS is a daily gridded land-only observational dataset over Europe. The blended time series from the station network of the European Climate Assessment & Dataset (ECA&D) project form the basis for the E-OBS gridded dataset\footnote{\href{https://cds.climate.copernicus.eu/cdsapp#!/dataset/insitu-gridded-observations-europe?tab=overview}{\textcolor{blue}{Copernicus}}}.
+E-OBS is a daily gridded land-only observational dataset over Europe. The blended time series from the station network of the European Climate Assessment \& Dataset (ECA\&D) project form the basis for the E-OBS gridded dataset\footnote{\href{https://cds.climate.copernicus.eu/cdsapp#!/dataset/insitu-gridded-observations-europe?tab=overview}{\textcolor{blue}{Copernicus}}}.
 
 \pause
 
@@ -626,7 +628,7 @@ Often, multiple RCMs are applied to downscale the output of a single GCM. This r
 
 \begin{frame}{Data and Study Area}
 
-The reference data has a 0.25° grid spacing. The options presented for E-OBS data are:
+The reference data has a 0.25° grid spacing. The options presented for E-OBS data are\footnote{\href{https://cds.climate.copernicus.eu/cdsapp#!/dataset/insitu-gridded-observations-europe?tab=form}{\textcolor{blue}{E-OBS Copernicus}}}:
 
 \hfill
 
@@ -797,16 +799,22 @@ The difference in ranking is calculated for all possible combinations of error m
 
 \begin{frame}{Ranking Order Example}    
 
-Assuming three climate models $M_1$, $M_2$, and $M_3$ with rankings based on two error metrics $E_1$ and $E_2$:
+Assuming three climate models $M_1$, $M_2$, and $M_3$ with rankings based on three error metrics $E_1$, $E_2$, and $E_3$:
 
 \begin{align*}
 &\text{Rankings by } E_1: \\
 &M_1: 3, \quad M_2: 1, \quad M_3: 2 \\
 &\text{Rankings by } E_2: \\
 &M_1: 2, \quad M_2: 3, \quad M_3: 1 \\
+&\text{Rankings by } E_3: \\
+&M_1: 1, \quad M_2: 2, \quad M_3: 3 \\
 \end{align*}
 
-Now, let's calculate $r_{M,\text{mean}}$ for $M_1$, the average rank difference for M1 across all the grid points based on the given error metrics.
+$\mu_g()$ and $max_g()$ are the mean and maxixum operator, which is applied across all the grid points $g: 1,2,...,gd$.
+
+\hfill
+
+Now, let's calculate $r_{M,\text{mean}}$ for $M_1$, the average rank difference for $M_1$ across all the grid points based on the given error metrics.
 
 \end{frame}
 
@@ -815,16 +823,15 @@ Now, let's calculate $r_{M,\text{mean}}$ for $M_1$, the average rank difference 
 \begin{align*}
 r_{M,\text{mean}} &= \mu_g(R_{M,k} - R_{M,i}) \\
 &= \frac{1}{g} \sum_{k=1}^{N_E-1} \sum_{i=k+1}^{N_E} (R_{M,k} - R_{M,i}) \\
-&= \frac{1}{g} \left[ (R_{M,1} - R_{M,2}) + (R_{M,1} - R_{M,3}) + (R_{M,2} - R_{M,3}) \right] \\
-&= \frac{1}{g} \left[ (3 - 1) + (3 - 2) + (1 - 2) \right] \\
-&= \frac{1}{g} \cdot 2 \\
+r_{M=1, \text{mean}} &= \frac{1}{g} \sum_{k=1}^{2} \sum_{i=k+1}^{3} (R_{M=1,k} - R_{M=1,i}) \\ 
+r_{M=1, \text{mean}} &= \frac{1}{g} \left[ (R_{M=1,1} - R_{M=1,2}) + (R_{M=1,1} - R_{M-1,3}) \\
+&+ (R_{M=1,2} - R_{M=1,3}) \right] \\
+&= \frac{1}{g} \left [ (3 - 2) + (3 - 1) + (2 - 1)\right]\\
+&= \frac{1}{g} \left (4 \right)
 \end{align*}
 
-If we assume $g = 4$:
+If we assume $g = 8$: $r_{M=1,\text{mean}} &= \frac{4}{8} = \frac{1}{2}$.
 
-\begin{align*}
-r_{M,\text{mean}} &= \frac{2}{4} = \frac{1}{2}
-\end{align*}
 
 \end{frame}
 
@@ -836,7 +843,7 @@ Different error metrics used to assess climate models result in significantly di
 
 \hfill
 
-The results indicate significant differences in the ranking of the climate models by different error metrics. The disparity in ranking order may be due to the distinctive error targeted by each metrics.
+The results indicate significant differences in the ranking of the climate models by different error metrics. The disparity in ranking order may be due to the distinctive error targeted by each metric.
 
 \pause
 
@@ -874,19 +881,144 @@ The CRP has flexibility and ability to handle an unknown or potentially infinite
 
 \subsubsection{Clustering Algorithm}
 
-\begin{frame}{Clustering Algorithm}
+\begin{frame}[fragile]{Clustering Algorithm}
 
-The code can be accessed at \href{https://github.com/AlexFidalgo/BergenProject/blob/main/Bergen_Metrics/clustering_algorithm/clustering_algorithm.py}{\textcolor{blue}{GitHub - Clustering Algorithm}.}
+
+The first error metric $E_1$ forms the first cluster $C_1$.
+
+\begin{verbatim}
+clusters = [[1]]
+\end{verbatim}
 
 \hfill
 
-The first error metric $E_1$ forms the first cluster $C_1$. The $i_{th}$ error metric is assigned to a cluster which has the maximum of all the mean absolute error ($u_j$) greater than a particular threshold value $\tau$.
+The $i_{th}$ error metric is assigned to a cluster which has the maximum of all the mean absolute error ($u_j$) greater than a particular threshold value $\tau$.
+
+
+\hfill
+
+The $MAE(RO_i, RO_k)$ between the ranking order produced by two error metrics is computed. The $MAE$ values are calculated for all possible combinations of error metrics in a particular cluster and the maximum value of $MAE$ is used to compare it to the threshold value.
+
+\hfill
+
+The exercise is repeated for all the clusters ($N_C$) available at that time. The number of clusters and the number of error metrics in each cluster ($N_{CE}$) are updated for each iteration and if the criteria is not satisfied, then a new cluster is formed using that error metric. The whole exercise is repeated till all the error metrics ($N_E$) gets assigned to a cluster.
+
+\end{frame}
+
+\begin{frame}[fragile]{Clustering Algorithm}
+
+{\scriptsize % Start smaller font size
+\begin{verbatim}
+for current_metric_index in range(2, num_error_metrics + 1):
+    max_mae_values = np.zeros(len(clusters))
+
+    for cluster_index, current_cluster in enumerate(clusters):
+        individual_mae_values = np.zeros(len(current_cluster))
+
+        for cluster_metric_index, cluster_metric in enumerate(current_cluster):
+            individual_mae_values[cluster_metric_index] = calculate_mae(
+                matrix, current_metric_index - 1, cluster_metric - 1
+            )
+
+        max_mae_values[cluster_index] = np.max(individual_mae_values)
+
+    if np.min(max_mae_values) < threshold:
+        min_index, = np.where(max_mae_values == np.min(max_mae_values))
+        clusters[min_index[0]].append(current_metric_index)
+    else:
+        clusters.append([current_metric_index]) 
+\end{verbatim}
+}
+
+The code can be accessed at \href{https://github.com/AlexFidalgo/BergenProject/blob/main/Bergen_Metrics/clustering_algorithm/clustering_algorithm.py}{\textcolor{blue}{GitHub - Clustering Algorithm}.}
+
+\end{frame}
+
+\begin{frame}{Clustering Algorithm}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\textwidth]{handwritten_algorithm.jpg}
+    \setlength{\abovecaptionskip}{0pt}
+    \label{fig:handwritten_algorithm}
+\end{figure}
     
 \end{frame}
     
+\begin{frame}[fragile]{Clustering Algorithm}
 
+The threshold value is the $q^{th}$ percentile of a column matrix $D$, where $D$ is the collection of MAE values for all possible combinations of error metrics at all the grid points in a region.
 
+{\scriptsize 
+\begin{verbatim}
+def calculate_threshold(D):
+    return np.percentile(D, 95)
+    
+D = np.zeros((matrix.shape[1], matrix.shape[1]))
+for i in range(matrix.shape[1]):
+    for j in range(matrix.shape[1]):
+        D[i, j] = calculate_mae(matrix, i, j)
+\end{verbatim}
+}
+\end{frame}
 
+\subsection{The Bergen Metrics}
+
+\begin{frame}{Bergen Metrics}
+
+The clustering of error metrics guarantees that metrics in different groups produce distinct ranking orders, implying that each group targets different errors.
+
+\hfill
+\pause
+
+One of the objectives of this study is to integrate different errors and create a composite error to obtain a single value.
+
+\hfill
+\pause
+
+One potential solution is to use the Euclidean distance approach with different error metrics as different dimensions in the Euclidean space. To illustrate this, we employed three widely used error metrics: RMSE, SD and correlation coefficient.
+
+\end{frame}
+
+\begin{frame}{Bergen Metrics}
+    
+
+In the Euclidean space, an ideal model that predicts the climate variable as accurately as the observed data would have 
+$$correlation \; coefficient = 1$$
+$$SD = 1$$
+$$RMSE_{normalized} = 0$$
+
+The coordinates of an ideal model in the Euclidean space would be (1,1,0). Since different models have unique coordinates based on the three metrics, these coordinates serve as possible solutions to determine the best model. If a decision is required, one approach could be to calculate the Euclidean distance from the ideal point to all points and select the point with the shortest distance.
+    
+\end{frame}
+
+\begin{frame}{Bergen Metrics}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{3dmetrics.png}
+    \label{fig:3dmetrics}
+\end{figure}
+
+$$ ED \; Metric = \left \sqrt{(1 - Correlation \; coefficient)^2 + (1 - SD)^2 + (0-RMSE)^2}\right$$
+$$ \implies$$
+
+\end{frame}
+
+\begin{frame}{Bergen Metrics}
+
+\begin{alertblock}{Euclidean Distance Metric}
+$$ED \; Metric = \left \sqrt{(1-Correlation \; coefficient)^2 + (1 - SD)^2 + (RMSE)^2}\right$$
+\end{alertblock}
+
+However, the Euclidian distance, also known as L2 norm, is less effective in higher dimensional spaces, which can lead to instability when additional error metrics are added.
+
+\hfill
+
+To mitigate this issue, recent research has focused on the use of L1 norms, such as relative mean absolute error and mean absolute scaled error, which have become more popular than L2 norms like mean squared error. This approach reduces the impact of outliers in the data.
+
+    
+\end{frame}
 
 \section{Conclusion}
 
