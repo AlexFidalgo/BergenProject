@@ -1017,8 +1017,21 @@ However, the Euclidian distance, also known as L2 norm, is less effective in hig
 
 To mitigate this issue, recent research has focused on the use of L1 norms, such as relative mean absolute error and mean absolute scaled error, which have become more popular than L2 norms like mean squared error. This approach reduces the impact of outliers in the data.
 
+\end{frame}
+
+\begin{frame}{Bergen Metrics}
+
+This study proposes the following new metrics called the Bergen Metrics (BM) which is a generalised p-norm framework to evaluate climate models.
+
+\begin{block}{Bergen Metrics (BM)}
+$$ \text{BM} = \biggl( (1 - \text{Correlation coefficient})^p + (1 - \text{SD})^p + (\text{RMSE})^p \biggr)^{\frac{1}{p}} $$
+\end{block}
+
+It serves as an illustration of Bergen metrics, and users have the flexibility to include or remove metrics according to their preference.
     
 \end{frame}
+
+linha 311
 
 \section{Conclusion}
 
