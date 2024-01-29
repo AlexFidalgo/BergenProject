@@ -110,6 +110,7 @@ CRP: Chinese Restaurant Process \\
 GCM: Global Climate Model\\
 GTOPO30: Global 30 Arc-Second Elevation Data Set\\
 K-G: Kling-Gupta\\
+MAD: Median Absolute Deviation\\
 MAE: Mean Absolute Error\\
 MSE: Mean Square Error\\
 NSE: Nash-Sutcliffe Efficiency\\
@@ -284,6 +285,23 @@ The correlation coefficient ranges from -1 to 1.
 
 In the context of climate model evaluation, a higher absolute value of the correlation coefficient suggests a better agreement between the modelled and reference data in terms of the phase of variability.
 
+\end{frame}
+
+\subsubsection{MAD Technique to Find Outliers}
+
+\begin{frame}{MAD}
+
+To calculate the median absolute deviation\footnote{\textcolor{blue}{\href{https://medium.com/@n.j.marey/outlier-detection-median-absolute-deviation-in-sas-971e07f95b67\#\string~:text\string=~:text\%3Dmedian\%20absolute\%20deviation\%20is\%20a\%2Cthe\%20mean\%20and\%20standard\%20deviation.}{Medium}}}.:
+
+\begin{enumerate}
+    \item Calculate the median of the population, $\text{median}(\text{population})$.
+    \item Calculate the deviation from the median using the absolute value of the deviations: $|\text{x} - \text{median}(\text{population})| = \text{deviation}$.
+    \item Find the median of the absolute deviations, $\text{median}(|\text{deviations}|)$, which is called the scaling factor.
+    \item Add the scaling factor to the median of the population for the upper bound.
+    \item Subtract the scaling factor from the median of the population for the lower bound.
+    \item Anything outside of the bounds is considered an outlier.
+\end{enumerate}
+    
 \end{frame}
 
 \subsection{Chinese Restaurant Process}
@@ -1031,7 +1049,61 @@ It serves as an illustration of Bergen metrics, and users have the flexibility t
     
 \end{frame}
 
-linha 311
+\begin{frame}{BM - Case Study}
+
+Five error metrics - RMSE, bias, correlation coefficient, standard deviation ratio, and mean ratio - have been considered. The study includes 89 RCM simulations for precipitation.
+{\scriptsize % Start of font size adjustment
+\[
+\text{BM} = \biggl( (-\text{RMSE})^p + (-\text{Bias})^p + (1 - \text{Correlation coefficient})^p + (1 - \text{SD})^p + (1 - \text{Mean ratio})^p\biggr)^{\frac{1}{p}}
+\]
+}
+    
+\end{frame}
+
+\begin{frame}{BM - Case Study}
+\begin{minipage}{0.5\textwidth}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\linewidth]{change_in_ranking.png}
+    \captionsetup{font=scriptsize} 
+    \caption{The change in the ranking of the climate models with different norm order.}
+    \label{fig:change_in_ranking}
+\end{figure}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+The lines corresponding to each model give information about the model’s ranking in different norms. The results demonstrate that \textcolor{blue}{climate models are highly sensitive to p norms}. Significant change in ranking order is observed for the first four norms.
+\end{minipage}
+\end{frame}
+
+\begin{frame}{BM - Case Study}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=0.7\textwidth]{outlier_total_error.png}
+  \captionsetup{font=scriptsize, skip=0pt, belowskip=-10pt}  
+  \caption{The percentage contribution of outliers to the total error magnitude as a function of norm order. The colours represent different outliers.}
+  \label{fig:outlier_total_error}
+\end{figure}
+
+MAD technique is used to identify outliers among the error metrics. Some of the models have only one outlier (plots with a single solid line) and other models have two outliers (plots with both solid and dotted lines). The percentage contribution of outliers increases as the p-norm increases.
+
+\end{frame}
+
+\begin{frame}{BM - Case Study}
+\begin{minipage}{0.5\textwidth}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.9\textwidth]{average_distance.png}
+    \captionsetup{font=scriptsize} 
+    \caption{The change in the difference between the maximum and minimum distances and the average distances with different norm order.}
+    \label{fig:average_distance}
+\end{figure}
+\end{minipage}%
+\begin{minipage}{0.5\textwidth}
+The study has used two parameters to indicate the capability of each norm to differentiate between climate models - mean pairwise difference of the BM and the difference between the maximum and minimum values of the BM. Both parameters decrease as the p-norm increases, indicating less differentiability. The results suggest that the first norm (p=1) is the optimal norm to use as a metric in this study and will be utilized in the following analyses.
+\end{minipage}
+    
+\end{frame}
 
 \section{Conclusion}
 
