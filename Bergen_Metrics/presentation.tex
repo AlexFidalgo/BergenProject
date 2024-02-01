@@ -841,14 +841,14 @@ Now, let's calculate $r_{M,\text{mean}}$ for $M_1$, the average rank difference 
 \begin{align*}
 r_{M,\text{mean}} &= \mu_g(R_{M,k} - R_{M,i}) \\
 &= \frac{1}{g} \sum_{k=1}^{N_E-1} \sum_{i=k+1}^{N_E} (R_{M,k} - R_{M,i}) \\
-r_{M=1, \text{mean}} &= \frac{1}{g} \sum_{k=1}^{2} \sum_{i=k+1}^{3} (R_{M=1,k} - R_{M=1,i}) \\ 
-r_{M=1, \text{mean}} &= \frac{1}{g} \left[ (R_{M=1,1} - R_{M=1,2}) + (R_{M=1,1} - R_{M-1,3}) \\
+r_{M=1, \text{mean}} &=  \sum_{k=1}^{2} \sum_{i=k+1}^{3} (R_{M=1,k} - R_{M=1,i}) \\ 
+r_{M=1, \text{mean}} &= \left[ (R_{M=1,1} - R_{M=1,2}) + (R_{M=1,1} - R_{M-1,3}) \\
 &+ (R_{M=1,2} - R_{M=1,3}) \right] \\
-&= \frac{1}{g} \left [ (3 - 2) + (3 - 1) + (2 - 1)\right]\\
-&= \frac{1}{g} \left (4 \right)
+&= \left [ (3 - 2) + (3 - 1) + (2 - 1)\right]\\
+&=  4
 \end{align*}
 
-If we assume $g = 8$: $r_{M=1,\text{mean}} &= \frac{4}{8} = \frac{1}{2}$.
+We assume $g = 1$, that is, only one grid point (or having a single cluster for all grid points within the region).
 
 
 \end{frame}
@@ -1100,8 +1100,122 @@ MAD technique is used to identify outliers among the error metrics. Some of the 
 \end{figure}
 \end{minipage}%
 \begin{minipage}{0.5\textwidth}
-The study has used two parameters to indicate the capability of each norm to differentiate between climate models - mean pairwise difference of the BM and the difference between the maximum and minimum values of the BM. Both parameters decrease as the p-norm increases, indicating less differentiability. The results suggest that the first norm (p=1) is the optimal norm to use as a metric in this study and will be utilized in the following analyses.
+The study has used two parameters to indicate the capability of each norm to differentiate between climate models - \textcolor{teal}{mean pairwise difference of the BM} and the \textcolor{teal}{difference between the maximum and minimum values of the BM}. \textbf{Both parameters decrease as the p-norm increases, indicating less differentiability}. The results suggest that \textcolor{olive}{the first norm (p=1) is the optimal norm to use as a metric} in this study and will be utilized in the following analyses.
 \end{minipage}
+\end{frame}
+
+\section{Results}
+
+\subsection{Regional Clustering of Error Metrics}
+
+\begin{frame}{Regional Clustering of Error Metrics}
+
+The clustering technique described in the methodology section can be applied to individual grid points, but for the sake of simplicity, we use \textcolor{blue}{a single cluster for all grid points} within each of these regions.
+
+\hfill
+
+The methodology is modified slightly to enable regional clustering. At a grid point scale, the maximum value of MAE is used as a proxy for that specific error metric at a grid point. \textcolor{blue}{For regional clustering, the maximum MAE values are computed for all grid points within the region, and the average of those values is used as a proxy for that region and error metric}.
+
+\hfill
+
+This value is then compared with a threshold to determine whether the error metric belongs to a certain cluster or it should be assigned to a new cluster. The clustering algorithm is executed for  multiple thresholds.
+\end{frame}
+
+\begin{frame}{Regional Clustering of Error Metrics}
+
+The $5^{th}$, $10^{th}$, and $20^{th}$ percentiles are selected as potential thresholds to cluster the error metrics. However, users can select any number of thresholds for the sensitivity analysis.
+
+\hfill
+
+The efficiency of each cluster for a given threshold is represented by the mean of MAE over all the clusters.
+
+\hfill
+
+\textcolor{red}{An increase in the percentile (q) is expected to increase the MAE as the magnitude of threshold increases}.
+
+\hfill
+
+\[ \uparrow q \implies  \downarrow \text{number of clusters} \]
+
+The $10^{th}$ percentile is selected as the threshold to cluster the error metrics for both temperature and precipitation, as it has a smaller number of clusters compared to $5^{th}$ percentile and less MAE compared to $20^{th}$ percentile.
+
+\end{frame}
+
+\begin{frame}{Regional Clustering of Error Metrics}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.8\textwidth]{variation_MAE_and_number_of_clusters.png}
+    \captionsetup{font=scriptsize} 
+    \caption{The variation in MAE (first box) and number of clusters (second box) corresponding to $5^{th}$, $10^{th}$ and $20^{th}$ percentile for precipitation (pr) and temperature (tas) for all the eight regions.}
+    \label{fig:average_distance}
+\end{figure}
+    
+\end{frame}
+
+\subsection{Results of Clustering}
+
+\begin{frame}{Precipitation}
+
+For the British Isles region, the classification of 38 error metrics resulted in 15 clusters, with 8 error metrics being single point clusters due to their unique behavior. The threshold for precipitation data is 6.35, indicating that all 8 error metrics produced MAE values greater than 6.35 compared to the remaining 30 error metrics.
+
+\hfill
+\pause
+
+RMSE [32] and its variants such as normalized RMSE by IQR [25], mean [26] and range [27] are assigned to the same cluster, as ED [7], IRMSE [9], MAE [13], MAPD [15], MASE [16], and MSE [23].
+
+\hfill
+\pause
+
+Error metrics that evaluate the phase difference between observed and modelled data, including ACC [1], R (Pearson) [30], SC [34], and M [38], are assigned to a single cluster.
+
+\end{frame}
+
+\begin{frame}{Precipitation}
+
+H10(MAHE) [8] and MALE [14] share the same cluster as both metrics consider the difference of logarithmic of the model and observed data to compute the error. Similarly, MdAE [18] and MdSE [20] are assigned to a single cluster, as both metrics use the median of the difference between observed and modelled data. However, MdE [19] is assigned to a different cluster as it only considers the difference between observed and modelled data without bringing them to the positive domain.
+
+\hfill
+\pause
+
+NED [24] and SA [33] are found to be in the same cluster, as both metrics are linearly associated while evaluating the model.
+
+\hfill
+\pause
+
+Although ED [7] and NED [24] follow the L2 norm, they are not assigned to the same cluster. This can be attributed to the normalisation of observed and modelled data by their respective means in NED, as the statistical parameters such as mean is sensitive to outliers, which can result in changes in ranking order.
+
+\end{frame}
+
+\begin{frame}{Temperature}
+
+Compared to precipitation data, temperature data has a lower number of clusters, which can be attributed to the lower variability in temperature data.
+    
+\end{frame}
+
+\subsection{Bergen Metrics}
+
+\begin{frame}{Bergen Metrics}
+
+A Bergen metric is computed for all eight regions using the respective clusters for both precipitation and temperature. A single metric is chosen from each cluster randomly. Random selection demonstrated no discernible impact on the ranking.
+
+\hfill
+
+Although computed for all 89 regional climate models, this paper focuses on discussing only one climate model for both precipitation and temperature. The CLM Community (CLMCom) regional model from ICHEC-EC-EARTH for r3i1p1 realisation is discussed as it performed best at over 25 grid points in 5 regions and more than 2 grid points in seven regions.
+
+\hfill
+
+A Bergen metric (BM) is used to assess the performance of the CLMCom model for precipitation in all eight different regions. The BM in British Isles region is a composite metric that takes into account 15 different error metrics
+    
+\end{frame}
+
+\begin{frame}{Bergen Metrics}
+
+The magnitude of BM ranges from 0 to 13, with a score of 0 indicating good performance by the model. Based on the results, the CLMCom model performed well in the western part of British Isles, as indicated by the BM. This is a result of the good performance of most of the individual metrics that comprise the Bergen Metric.
+
+\hfill
+
+The use of individual error metrics can provide meaningful insights into the performance of the model in different regions. The use of multiple error metrics and the analysis of individual metrics can provide a more comprehensive assessment of the model's performance, particularly in regions where different metrics provide conflicting results.
     
 \end{frame}
 
