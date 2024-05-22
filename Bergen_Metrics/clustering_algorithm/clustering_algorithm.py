@@ -3,7 +3,7 @@ import numpy as np
 def generate_random_data(num_models, num_metrics):
     """Simulates ranking for each metric and model"""
     
-    np.random.seed(42)
+    # np.random.seed(42)
     data_matrix = np.column_stack([np.random.permutation(np.arange(1, num_models + 1)) 
                                    for _ in range(num_metrics)])
     return data_matrix
@@ -12,8 +12,8 @@ def calculate_mae(matrix, current_metric, reference_metric):
     return np.mean(np.abs(matrix[:, current_metric] - matrix[:, reference_metric]))
 
 def calculate_threshold(D):
-    # Calculate the threshold as the 95th percentile of MAE values
-    return np.percentile(D, 95)
+    # Calculate the threshold as the 20th percentile of MAE values
+    return np.percentile(D, 20)
 
 def clustering_algorithm(matrix):
     D = np.zeros((matrix.shape[1], matrix.shape[1]))
