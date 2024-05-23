@@ -47,7 +47,7 @@ print(f"\nFirst error metric: {cluster_region101[2][0][0][0][0]}") # shows the f
 # mat_vector <- as.vector(mat_data$ppt)
 mat_data = read_mat_with_scipy("error_ppt_BI")
 mat_data_ppt = mat_data['ppt']
-mat_vector = mat_data_ppt.flatten()
+mat_vector = mat_data_ppt.flatten(order='F')
 
 # Metric = rep(seq_len(dim(mat_data$ppt)[3]), each = dim(mat_data$ppt)[1] * dim(mat_data$ppt)[2])
 # Gridpoint = rep(rep(seq_len(dim(mat_data$ppt)[2]), each = dim(mat_data$ppt)[1]), times = dim(mat_data$ppt)[3])
