@@ -11,6 +11,12 @@ def read_mat_with_scipy(file):
     mat_files_folder = os.path.join(get_current_dir(), 'mat_files')
     return scipy.io.loadmat(os.path.join(mat_files_folder, file +'.mat'))
 
+def read_excel(file, sheet_name = None):
+    current_dir = get_current_dir()
+    file_path = os.path.join(get_current_dir(), 'mat_files', file)
+    df = pd.read_excel(file_path, sheet_name)
+    return df
+
 # cluster_region <- readMat("clusters_regionwise.mat")
 cluster_region = read_mat_with_scipy("clusters_regionwise") # The file "clusters_regionwise.mat" contains the information about the clustering for each region
 
@@ -61,3 +67,14 @@ df_BI = pd.DataFrame(database_BI_np, columns=['Model', 'Gridpoint', 'Metric', 'm
 # gridpoint4 <- subset(df_BI, Gridpoint == 4)
 gridpoint4 = df_BI[df_BI['Gridpoint'] == 4] # tá com uma discrepância em relação ao DataRCommands.r
 
+# gp4metric16 <- subset(gridpoint4, Metric == 16)
+gp4metric16 = gridpoint4[gridpoint4['Metric'] == 16]
+
+# library(readxl)
+# file_path <- "Models_89_test.xlsx"
+# data <- read_excel(file_path, sheet = "Sheet1")
+file_path = "Models_89_test.xlsx"
+data = read_excel(file_path, sheet_name="Sheet1")
+
+# merged_df <- merge(gp4metric16, data, by.x = "Model", by.y = "Number")
+merged_df = pd.merge(gp4metric16, data, left_on="Model", right_on="Number")
