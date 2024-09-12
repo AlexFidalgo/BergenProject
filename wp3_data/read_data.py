@@ -23,6 +23,8 @@ cluster_region = read_mat_with_scipy("clusters_regionwise") # The file "clusters
 # cluster_region$c101
 cluster_region101 = cluster_region['c101'] # contains 20 rows (variables) and 8 columns (regions); 3rd variable is precipitation, 10th variable is temperature
 
+print(f"\nShape: {cluster_region101.shape}")
+
 # cluster_region101 can be by a list with a total of 7 indices in R
 
 # nrow(cluster_region$c101[3,1][[1]][[1]])
@@ -65,7 +67,7 @@ df_BI = pd.DataFrame(database_BI_np, columns=['Model', 'Gridpoint', 'Metric', 'm
 ### Example for Gripoint 4
 
 # gridpoint4 <- subset(df_BI, Gridpoint == 4)
-gridpoint4 = df_BI[df_BI['Gridpoint'] == 4] # tá com uma discrepância em relação ao DataRCommands.r
+gridpoint4 = df_BI[df_BI['Gridpoint'] == 4] 
 
 # gp4metric16 <- subset(gridpoint4, Metric == 16)
 gp4metric16 = gridpoint4[gridpoint4['Metric'] == 16]
