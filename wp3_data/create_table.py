@@ -8,6 +8,10 @@ import seaborn as sns
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'analyzing_models')))
 from RCMs_GCMs import *
+from statistical_analysis import *
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'prediction')))
+from LinearRegression import *
 
 def get_current_dir():
     current_dir = os.path.dirname(os.path.realpath(__file__))
@@ -260,6 +264,28 @@ def insert_models_ids(cons):
 
     return final_df
 
+def generate_pivot_table_RCM_x_GCM(cons):
+    """
+    Generates a pivot table with id_RCM as rows and id_GCM as columns, 
+    where each cell contains the count of rows for that specific id_RCM and id_GCM.
+
+    Parameters:
+    cons (pd.DataFrame): The input dataframe containing the columns 'id_RCM' and 'id_GCM'.
+
+    Returns:
+    pd.DataFrame: The pivot table with id_RCM as rows and id_GCM as columns.
+    """
+    pivot_table = pd.pivot_table(
+        cons, 
+        values='mat_vector',  # Any column can be used here to count the occurrences
+        index='id_RCM', 
+        columns='id_GCM', 
+        aggfunc='count',  # Counts the number of occurrences
+        fill_value=0  # Fill missing values with 0
+    )
+    
+    return pivot_table
+
 if __name__ == '__main__':
 
     cons, region_table = create_cons()
@@ -272,3 +298,56 @@ if __name__ == '__main__':
     # plot_error_distribution_by_region(cons)
 
     cons = insert_models_ids(cons)
+
+    ### Exploratory Statistics ### 
+
+    ## 1 ##
+
+    # # average_then_pivot
+    # rcms_correlations_for_fixed_gcms = calculate_rcm_correlations_for_fixed_gcms_average_then_pivot(cons)
+    # visualize_rcms_correlations_for_fixed_gcms(rcms_correlations_for_fixed_gcms, 'average_then_pivot')
+
+    # # granular_correlations
+    # rcms_correlations_for_fixed_gcms = calculate_rcm_correlations_for_fixed_gcms_granular_correlations(cons)
+    # visualize_rcms_correlations_for_fixed_gcms(rcms_correlations_for_fixed_gcms, 'granular_correlations')
+
+    # # specific metric
+    # rcms_correlations_for_fixed_gcms = calculate_rcm_correlations_for_fixed_gcms_specific_metric_variable(cons)
+    # visualize_rcms_correlations_for_fixed_gcms(rcms_correlations_for_fixed_gcms, 'specific_metric_variable')
+
+    ## 2 ##
+
+    # heatmap
+    # create_average_error_and_std_maps_for_gcms(cons)
+
+    ## 3 ##
+
+    # # correlation for fixed gcm-region
+    # correlation_analysis_by_region_and_gcm_granular(cons, region_code='BI') #just for british isles for now
+
+    ## 4 ## 
+
+    # hierarchical clustering
+    # hierarchical_clustering(cons, error_metric=1, region='BI') #just for british isles for now
+
+    # hierarchical clustering with fixed gcm 
+    # hierarchical_clustering_fixed_gcm(cons, error_metric=1, region='BI', gcm_id=2)
+
+    ## 5 ##
+    averaged_correlation_matrix, averaged_counts_matrix = calculate_general_rcm_correlations(cons)
+    visualize_general_rcm_correlations(averaged_correlation_matrix, folder_name='general_rcm_correlations')
+    visualize_pair_counts(averaged_counts_matrix)
+
+
+
+    ### Prediction ###
+
+    # Linear Regression #
+
+    # for fixed error metric
+    # model, coef_df = predict_rcm_error_with_linear_regression_for_fixed_metric(cons, target_rcm=6, fixed_gcm=3, error_metric=1)
+
+
+    # RCM_GCM_matrix = generate_pivot_table_RCM_x_GCM(cons)
+
+

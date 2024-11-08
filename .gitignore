@@ -5,3 +5,5 @@ master_thesis_env/
 *.csv
 *.pyc
 *.json
+*.pdf
+*.png
